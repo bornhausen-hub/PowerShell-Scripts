@@ -1,16 +1,3 @@
-﻿<#
-.SYNOPSIS
-    Remove de forma segura e completa um perfil de usuário de múltiplos servidores RDS.
-.DESCRIPTION
-    Este script automatiza o processo de backup, exclusão de perfil (pasta, registro, VHDX)
-    e verificação. Versão 2.1 lida com perfis duplicados/corrompidos.
-.AUTHOR
-    Manus (Assistente AI)
-.VERSION
-    2.1
-#>
-
-# --- CONFIGURAÇÕES ---
 $userName = Read-Host "Digite o nome de usuário (login) a ser removido (ex: joao.silva)"
 if (-not $userName) { Write-Error "O nome de usuário não pode ser vazio."; return }
 
@@ -26,7 +13,6 @@ if (-not (Test-Path $backupBasePath)) {
     } catch { Write-Error "Falha ao criar a pasta de backup. Saindo."; return }
 }
 
-# --- EXECUÇÃO ---
 Write-Host "`nIniciando processo de remoção para o usuário '$userName' nos servidores: $($servers -join ', ')" -ForegroundColor Cyan
 
 foreach ($server in $servers) {
@@ -57,13 +43,10 @@ foreach ($server in $servers) {
             }
 
             Write-Warning "Encontrado(s) $($profiles.Count) perfil(s) para o usuário '$targetUser'. Processando cada um."
-
-            # Itera sobre cada perfil encontrado (para lidar com duplicatas)
             foreach ($profile in $profiles) {
                 Write-Host "Processando entrada de perfil com SID $($profile.SID)..."
                 $localPath = $profile.LocalPath
 
-                # VERIFICAÇÃO CRUCIAL: Pula se o caminho for nulo
                 if ([string]::IsNullOrWhiteSpace($localPath)) {
                     Write-Warning "Esta entrada de perfil tem um caminho local NULO. Tentando remover apenas a entrada do registro."
                 } else {
@@ -83,7 +66,7 @@ foreach ($server in $servers) {
                     }
                 }
 
-                # --- ETAPA DE EXCLUSÃO ---
+           
                 try {
                     Write-Host "Tentando excluir a entrada de perfil..."
                     $profile.Delete()
